@@ -1,5 +1,7 @@
 import React from 'react';
 import './MessageDetails.css';
+import APIClient from '../../services/APIClient';
+import LocalStorage from '../../utils/LocalStorage';
 
 /**
  * This page should edit/delete messages.
@@ -14,15 +16,29 @@ export default class MessageDetailsPage extends React.Component {
         this.params = params;
         //Add other attributes here
         this.state = {
-            email: "",
-            password: ""
+            message: {},
+            showDeleteButton: false,
+            showEditButton: false
         }
     }
 
-    componentDidMount()
+    async componentDidMount()
     {
-        //APIs should be called here in this method.
-        console.log("Component Mounted")
+        const message = await (new APIClient().getMessagesService().getMessageById(this.params.id))
+        const user = new LocalStorage().getUser();
+        this.setState({
+            message,
+            showDeleteButton: user._id === message.receiverId? true: false
+        })
+    }
+
+    showDeleteButton()
+    {
+        if(this.state.showDeleteButton)
+        {
+            return <button>DELETE</button>
+        }
+        return null;
     }
 
     
@@ -31,7 +47,8 @@ export default class MessageDetailsPage extends React.Component {
         <div className="main-container">
             <h2>Message Details: {this.params.id} </h2>
             <div className="message-container" >
-              
+              {this.showDeleteButton()}
+              <input type="text" value={this.state.message.message} />
             </div>
         </div>
       );

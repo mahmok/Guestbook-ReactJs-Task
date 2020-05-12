@@ -10,8 +10,7 @@ export default class MessagesPage extends React.Component {
         super(props)
         //Add other attributes here
         this.state = {
-            email: "",
-            password: ""
+            messages: []
         }
     }
 
@@ -21,7 +20,10 @@ export default class MessagesPage extends React.Component {
 
         
         console.log("Component Mounted")
-        console.log(await (new APIClient().getMessagesService().getMessages()));
+        const messages = await (new APIClient().getMessagesService().getMessages());
+        this.setState({messages})
+
+
     }
 
     
@@ -32,23 +34,15 @@ export default class MessagesPage extends React.Component {
     }
 
     renderMessages(){
-        const messages = [];
-        //Replace this from backend
-        // The id should be replaced with mongodb ID
-        for(let i = 0; i < 10; i++)
-        {
-            messages.push(
-                <MessageItem 
-                    key={i} 
-                    name="Mahmoud Mokhtar" 
-                    message="Here is a demo message." 
-                    timestamp="13/05/2020" 
-                    avatar={null}
-                    onCardClick={() => this.onCardClick(i) } 
-                />
-            )
-        }
-        return messages;
+        const messages = this.state.messages;
+        return messages.map(m =><MessageItem 
+            key={m._id} 
+            name={m.name} 
+            message={m.message}
+            timestamp={m.timestamp} 
+            avatar={null}
+            onCardClick={() => this.onCardClick(m._id) } 
+        />);
     }
 
     

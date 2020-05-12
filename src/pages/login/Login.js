@@ -1,5 +1,7 @@
 import React from 'react';
 import './Login.css';
+import APIClient from '../../services/APIClient';
+import LocalStorage from '../../utils/LocalStorage';
 
 export default class LoginPage extends React.Component {
     
@@ -12,10 +14,19 @@ export default class LoginPage extends React.Component {
         }
     }
     
-    onLoginButtonClick()
+    async onLoginButtonClick()
     {
-        console.log(this.state);
-        this.props.history.push("/");
+        if(!this.state.email || this.state.email === "" || !this.state.password || this.state.password === "")
+        {
+            alert("Please fill in all data");
+            return;
+        }
+
+        const user = await new APIClient().getAuthService().login({email: this.state.email, password: this.state.password})
+
+        new LocalStorage().saveUser({_id: user._id, name: user.name, token: user.token});
+
+        this.props.history.push("/messages");
     }
 
     onEmailChange(value)
